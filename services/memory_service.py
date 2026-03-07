@@ -1,10 +1,7 @@
 from typing import Any
 
-from memory.conversation_memory import ConversationMemory
-
-
 class MemoryService:
-    def __init__(self, memory_store: ConversationMemory) -> None:
+    def __init__(self, memory_store: Any) -> None:
         self.memory_store = memory_store
 
     async def save_turn(self, conversation_id: str, question: str, answer: str) -> None:

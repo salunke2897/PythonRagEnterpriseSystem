@@ -11,10 +11,16 @@ async def health_check(request: Request) -> HealthResponse:
     settings = get_settings()
     redis_ok = True
     chroma_ok = True
-    try:
-        await request.app.state.redis_client.ping()
-    except Exception:
-        redis_ok = False
+
+    if settings.cache_backend.lower() == "redis" or settings.memory_backend.lower() == "redis":
+        redis_client = getattr(request.app.state, "redis_client", None)
+        if redis_client is None:
+            redis_ok = False
+        else:
+            try:
+                await redis_client.ping()
+            except Exception:
+                redis_ok = False
 
     container = getattr(request.app.state, "service_container", None)
     if container is not None:
@@ -26,5 +32,10 @@ async def health_check(request: Request) -> HealthResponse:
     return HealthResponse(
         status="ok" if redis_ok and chroma_ok else "degraded",
         version=settings.app_version,
-        dependencies={"redis": redis_ok, "chroma": chroma_ok},
+        dependencies={
+            "redis": redis_ok,
+            "chroma": chroma_ok,
+            "cache_backend": settings.cache_backend,
+            "memory_backend": settings.memory_backend,
+        },
     )

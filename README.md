@@ -63,6 +63,11 @@ cp .env.example .env
 - `EMBEDDING_MODEL`
 - `REDIS_URL`
 
+For local development without Redis, set:
+
+- `CACHE_BACKEND=memory`
+- `MEMORY_BACKEND=memory`
+
 5. Start Redis locally.
 
 6. Run API:
@@ -81,6 +86,8 @@ uvicorn main:app --reload
 - `TOP_K`
 - `RERANK_TOP_K`
 - `REDIS_URL`
+- `CACHE_BACKEND` (`redis` or `memory`)
+- `MEMORY_BACKEND` (`redis` or `memory`)
 - `CHROMA_PERSIST_DIR`
 - `UPLOAD_DIR`
 - `MAX_PDF_SIZE_MB`

@@ -3,7 +3,6 @@ import time
 from collections.abc import AsyncGenerator
 from typing import Any
 
-from cache.redis_cache import RedisCache
 from observability.metrics import MetricsCollector
 from prompts.chat_prompt import CHAT_HISTORY_PROMPT
 from prompts.rag_system_prompt import RAG_SYSTEM_PROMPT
@@ -23,7 +22,7 @@ class RAGService:
         memory_service: MemoryService,
         evaluation_service: EvaluationService,
         rerank_top_k: int,
-        cache: RedisCache,
+        cache: Any,
         metrics_collector: MetricsCollector,
     ) -> None:
         self.retrieval_service = retrieval_service

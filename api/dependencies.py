@@ -2,7 +2,6 @@ from fastapi import Request
 
 from core.config import get_settings
 from ingestion.embedding_pipeline import EmbeddingPipeline
-from memory.conversation_memory import ConversationMemory
 from reranking.reranker import SimpleReranker
 from services.document_service import DocumentService
 from services.embedding_service import EmbeddingService
@@ -22,7 +21,7 @@ def _ensure_services(request: Request) -> None:
     settings = get_settings()
     cache = request.app.state.cache
     metrics = request.app.state.metrics
-    redis_client = request.app.state.redis_client
+    memory_store = request.app.state.memory_store
     vector_store = ChromaStore(persist_dir=settings.chroma_persist_dir)
 
     embedding_service = EmbeddingService(settings)
@@ -30,7 +29,7 @@ def _ensure_services(request: Request) -> None:
     document_service = DocumentService(EmbeddingPipeline(settings), embedding_service, vector_store)
     retrieval_service = RetrievalService(embedding_service, vector_store, cache)
     rerank_service = RerankService(embedding_service, SimpleReranker())
-    memory_service = MemoryService(ConversationMemory(redis_client))
+    memory_service = MemoryService(memory_store)
     evaluation_service = EvaluationService()
     rag_service = RAGService(
         retrieval_service=retrieval_service,

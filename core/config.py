@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     rerank_top_k: int = Field(default=5, alias="RERANK_TOP_K")
     max_tokens: int = Field(default=600, alias="MAX_TOKENS")
 
+    cache_backend: str = Field(default="redis", alias="CACHE_BACKEND")
+    memory_backend: str = Field(default="redis", alias="MEMORY_BACKEND")
+
     redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
     chroma_persist_dir: str = Field(default="./data/chroma", alias="CHROMA_PERSIST_DIR")
     upload_dir: str = Field(default="./data/uploads", alias="UPLOAD_DIR")

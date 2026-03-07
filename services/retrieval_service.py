@@ -1,6 +1,5 @@
 from typing import Any
 
-from cache.redis_cache import RedisCache
 from retrieval.hybrid_search import HybridSearch
 from retrieval.keyword_search import KeywordSearch
 from retrieval.vector_search import VectorSearch
@@ -13,7 +12,7 @@ class RetrievalService:
         self,
         embedding_service: EmbeddingService,
         vector_store: VectorStoreInterface,
-        cache: RedisCache,
+        cache: Any,
         vector_weight: float = 0.7,
         keyword_weight: float = 0.3,
     ) -> None:
