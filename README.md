@@ -44,6 +44,21 @@ rag-enterprise-system/
 ## Setup
 
 1. Create and activate virtual environment
+
+Windows (PowerShell):
+
+```bash
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+macOS/Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
 2. Install dependencies:
 
 ```bash
@@ -178,7 +193,3 @@ System prompt enforces strict context grounding:
 - Input length constraints via Pydantic
 - Sanitized file name handling for persisted uploads
 
-## Notes
-
-- For production, add authN/authZ, rate limiting, secret manager integration, and OpenTelemetry export.
-- Reranking is implemented with embedding similarity; can be upgraded to cross-encoder models.
