@@ -1,0 +1,157 @@
+{
+  "info": {
+    "_postman_id": "a7bcd4f0-2d3e-4f98-b13a-7f6e0b311d8e",
+    "name": "Enterprise RAG System",
+    "description": "Postman collection for all FastAPI endpoints in the Enterprise RAG System.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Upload PDF",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "{{pdfFilePath}}"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/documents/upload",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "documents",
+            "upload"
+          ]
+        },
+        "description": "Uploads a PDF and triggers ingestion (extract -> chunk -> embed -> index)."
+      },
+      "response": []
+    },
+    {
+      "name": "Search Documents (Hybrid)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/documents/search?q={{searchQuery}}&top_k={{topK}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "documents",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "{{searchQuery}}"
+            },
+            {
+              "key": "top_k",
+              "value": "{{topK}}"
+            }
+          ]
+        },
+        "description": "Runs hybrid retrieval (vector + BM25) over indexed chunks."
+      },
+      "response": []
+    },
+    {
+      "name": "Chat (SSE Stream)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "text/event-stream"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"{{chatQuestion}}\",\n  \"conversation_id\": \"{{conversationId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chat",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "chat"
+          ]
+        },
+        "description": "Streams token-by-token response via Server-Sent Events. Final event includes answer, sources, confidence_score, and evaluation."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "pdfFilePath",
+      "value": "C:/path/to/your/document.pdf"
+    },
+    {
+      "key": "searchQuery",
+      "value": "What does the document explain?"
+    },
+    {
+      "key": "topK",
+      "value": "10"
+    },
+    {
+      "key": "chatQuestion",
+      "value": "What does the document explain?"
+    },
+    {
+      "key": "conversationId",
+      "value": "conv-001"
+    }
+  ]
+}
