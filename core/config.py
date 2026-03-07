@@ -25,6 +25,10 @@ class Settings(BaseSettings):
 
     cache_backend: str = Field(default="redis", alias="CACHE_BACKEND")
     memory_backend: str = Field(default="redis", alias="MEMORY_BACKEND")
+    cors_origins: str = Field(
+        default="http://localhost:5173,http://127.0.0.1:5173",
+        alias="CORS_ORIGINS",
+    )
 
     redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
     chroma_persist_dir: str = Field(default="./data/chroma", alias="CHROMA_PERSIST_DIR")
@@ -36,6 +40,9 @@ class Settings(BaseSettings):
     def ensure_directories(self) -> None:
         Path(self.upload_dir).mkdir(parents=True, exist_ok=True)
         Path(self.chroma_persist_dir).mkdir(parents=True, exist_ok=True)
+
+    def get_cors_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
 
 @lru_cache(maxsize=1)
