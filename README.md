@@ -10,7 +10,7 @@ Production-style modular Retrieval-Augmented Generation platform for PDF knowled
 - Hybrid retrieval (vector + BM25)
 - Reranking step (top 10 → top 5)
 - Grounded anti-hallucination prompt
-- Conversational memory in Redis
+- Conversational memory in Redis or in-memory mode
 - SSE token streaming response
 - Caching (embeddings, retrieval, LLM responses)
 - Structured logging, request tracing, basic metrics
@@ -53,7 +53,7 @@ pip install -r requirements.txt
 3. Copy environment template:
 
 ```bash
-cp .env.example .env
+Copy-Item .env.example .env
 ```
 
 4. Set at minimum:
@@ -61,14 +61,17 @@ cp .env.example .env
 - `OPENAI_API_KEY`
 - `CHAT_MODEL`
 - `EMBEDDING_MODEL`
-- `REDIS_URL`
 
 For local development without Redis, set:
 
 - `CACHE_BACKEND=memory`
 - `MEMORY_BACKEND=memory`
 
-5. Start Redis locally.
+If using Redis backend, also set:
+
+- `REDIS_URL`
+
+5. Start Redis locally only when `CACHE_BACKEND=redis` or `MEMORY_BACKEND=redis`.
 
 6. Run API:
 
