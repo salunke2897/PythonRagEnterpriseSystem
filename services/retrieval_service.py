@@ -1,4 +1,5 @@
 from typing import Any
+import re
 
 from retrieval.hybrid_search import HybridSearch
 from retrieval.keyword_search import KeywordSearch
@@ -23,6 +24,28 @@ class RetrievalService:
         self.keyword_search = KeywordSearch()
         self.hybrid_search = HybridSearch(vector_weight=vector_weight, keyword_weight=keyword_weight)
 
+    @staticmethod
+    def _expand_query(query: str) -> str:
+        base = query.lower()
+        tokens = set(re.findall(r"[a-zA-Z0-9]+", base))
+        expansion = set(tokens)
+
+        semantic_aliases = {
+            "subject": {"subjects", "paper", "papers", "course", "courses", "curriculum", "syllabus"},
+            "learned": {"learnt", "studied", "taken", "completed"},
+            "marksheet": {"grade", "grades", "result", "transcript", "semester"},
+            "person": {"student", "candidate", "learner"},
+        }
+
+        for key, aliases in semantic_aliases.items():
+            if key in tokens:
+                expansion.update(aliases)
+
+        if "subject" in tokens or "subjects" in tokens:
+            expansion.update({"subject_code", "subject name"})
+
+        return " ".join(sorted(expansion))
+
     async def retrieve(self, query: str, top_k: int) -> tuple[list[dict[str, Any]], list[float]]:
         query_embedding_cache_key = f"embedding:query:{query}"
         cached_embedding = await self.cache.get(query_embedding_cache_key)
@@ -37,7 +60,8 @@ class RetrievalService:
 
         vector_results = await self.vector_search.search(query_embedding=query_embedding, top_k=top_k)
         corpus = await self.vector_store.get_all_documents()
-        keyword_results = await self.keyword_search.search(query=query, corpus_records=corpus, top_k=top_k)
+        expanded_query = self._expand_query(query)
+        keyword_results = await self.keyword_search.search(query=expanded_query, corpus_records=corpus, top_k=max(top_k * 3, top_k))
 
         combined = self.hybrid_search.combine(vector_results, keyword_results, top_k=top_k)
         await self.cache.set(retrieval_cache_key, combined, ttl=300)
