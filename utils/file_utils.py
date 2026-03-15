@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import UploadFile
@@ -28,3 +29,25 @@ async def save_upload_file(file: UploadFile, upload_dir: str) -> str:
     with open(target_path, "wb") as out_file:
         out_file.write(content)
     return str(target_path)
+
+
+def list_uploaded_files(upload_dir: str) -> list[dict]:
+    directory = Path(upload_dir)
+    if not directory.exists():
+        return []
+
+    files = []
+    for item in directory.iterdir():
+        if not item.is_file() or item.suffix.lower() != ".pdf":
+            continue
+        stat = item.stat()
+        files.append(
+            {
+                "file_name": item.name,
+                "file_size_bytes": stat.st_size,
+                "modified_at": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
+            }
+        )
+
+    files.sort(key=lambda file: file["modified_at"], reverse=True)
+    return files

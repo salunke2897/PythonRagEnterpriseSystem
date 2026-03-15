@@ -8,6 +8,16 @@ class UploadResponse(BaseModel):
     chunks_created: int
 
 
+class UploadedFileItem(BaseModel):
+    file_name: str
+    file_size_bytes: int
+    modified_at: str
+
+
+class UploadedFilesResponse(BaseModel):
+    files: list[UploadedFileItem]
+
+
 class SearchResult(BaseModel):
     chunk_id: str
     document_id: str

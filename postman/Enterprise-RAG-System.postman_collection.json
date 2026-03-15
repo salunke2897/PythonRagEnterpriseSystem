@@ -63,6 +63,30 @@
       "response": []
     },
     {
+      "name": "List Uploaded Files",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/documents/files",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "documents",
+            "files"
+          ]
+        },
+        "description": "Returns uploaded PDF files from the configured upload directory."
+      },
+      "response": []
+    },
+    {
       "name": "Search Documents (Hybrid)",
       "request": {
         "method": "GET",
