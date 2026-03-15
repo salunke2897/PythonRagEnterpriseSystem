@@ -112,6 +112,61 @@ uvicorn main:app --reload
 - `MAX_TOKENS`
 - `LOG_LEVEL`
 
+## Advanced PDF Extraction (New)
+
+The ingestion pipeline is upgraded for real-world enterprise PDFs (digital + scanned) while keeping the same project architecture.
+
+### Pipeline Flow
+
+`PDF Upload -> PDF Type Detection -> Parser Fallback -> OCR (if scanned) -> Layout Detection -> Table Extraction -> Image Extraction -> Header/Footer Cleaning -> Semantic Chunking -> Embedding -> Vector Index`
+
+### Ingestion Modules Added
+
+- `ingestion/detectors/pdf_type_detector.py`
+- `ingestion/parsers/pymupdf_parser.py`
+- `ingestion/parsers/pdfplumber_parser.py`
+- `ingestion/parsers/fallback_parser.py`
+- `ingestion/ocr/paddle_ocr.py`
+- `ingestion/layout/layout_detector.py`
+- `ingestion/tables/table_extractor.py`
+- `ingestion/images/image_extractor.py`
+- `ingestion/cleaners/text_cleaner.py`
+- `ingestion/chunking/semantic_chunker.py`
+- `ingestion/ingestion_service.py`
+
+### Extraction Behavior
+
+- **PDF type detection**: identifies digital vs scanned PDFs.
+- **Parser fallback**: tries PyMuPDF first, then pdfplumber, then optional Tika fallback.
+- **Scanned support**: allows empty parser text for scanned docs and continues with OCR.
+- **OCR**: PaddleOCR + OpenCV preprocessing for image-based pages.
+- **Layout support**: layout block detection (title/paragraph/list/table/figure).
+- **Tables**: extracted via Camelot and converted to markdown for LLM-friendly context.
+- **Images**: metadata extracted (page, size, extension, dimensions).
+- **Cleaner**: repeated header/footer line removal across pages.
+- **Semantic chunking**: section-aware chunks (~600–800 tokens) with deduplication.
+
+### Chunk Metadata
+
+Each chunk includes:
+
+- `document_id`
+- `page_number`
+- `section`
+- `chunk_type`
+- `source_file`
+- `chunk_id`
+
+### Observability for Ingestion
+
+Ingestion logs/metrics now track:
+
+- parser used
+- OCR usage
+- chunks created
+- ingestion time
+- failure events
+
 ## API Endpoints
 
 ### `POST /documents/upload`
